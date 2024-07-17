@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Utility</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const ssid = document.getElementById('drone-ssid');
+            const authKey = document.getElementById('auth-key');
+            const boughtFrom = document.getElementById('bought-from');
+            
+            let isValid = true;
+
+            if (!ssid.value) {
+                ssid.classList.add('invalid');
+                isValid = false;
+            } else {
+                ssid.classList.remove('invalid');
+            }
+
+            if (!authKey.value) {
+                authKey.classList.add('invalid');
+                isValid = false;
+            } else {
+                authKey.classList.remove('invalid');
+            }
+
+            if (!boughtFrom.value) {
+                boughtFrom.classList.add('invalid');
+                isValid = false;
+            } else {
+                boughtFrom.classList.remove('invalid');
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            let appendString = '';
+            const ssidValue = ssid.value.toLowerCase();
+            const authKeyValue = authKey.value;
+
+            if (ssidValue.startsWith('pluto') && !ssidValue.startsWith('plutox')) {
+                appendString = 'pluto';
+            } else if (ssidValue.startsWith('plutox')) {
+                appendString = 'plutox';
+            } else {
+                showModal('SSID does not start with "Pluto" or "PlutoX".');
+                return;
+            }
+
+            let password = '';
+            if (parseInt(authKeyValue) % 2 === 0) {
+                password = appendString + authKeyValue;
+            } else {
+                password = authKeyValue + appendString;
+            }
+
+            showModal('Generated Password: <strong>' + password + '</strong>');
+        }
+
+        function showModal(message) {
+            const modal = document.getElementById('myModal');
+            const modalText = document.getElementById('modal-text');
+            modalText.innerHTML = message;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('password-utility-form');
+            form.addEventListener('submit', handleFormSubmit);
+
+            const closeBtn = document.getElementsByClassName('close')[0];
+            closeBtn.addEventListener('click', closeModal);
+
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('myModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Remove invalid class on input change
+            document.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('input', () => {
+                    input.classList.remove('invalid');
+                });
+            });
+
+            // Hide modal on page load
+            closeModal();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2>Password Utility</h2>
+            <form id="password-utility-form">
+                <label for="drone-ssid">DRONE SSID:</label>
+                <input type="text" id="drone-ssid" name="drone-ssid" required>
+                
+                <label for="auth-key">AUTH KEY:</label>
+                <input type="text" id="auth-key" name="auth-key" required>
+                
+                <label for="bought-from">BOUGHT FROM:</label>
+                <select id="bought-from" name="bought-from" required>
+                    <option value="">Select</option>
+                    <option value="Amazon">Amazon</option>
+                    <option value="Website">Website</option>
+                    <option value="Vendor">Vendor</option>
+                    <option value="Other">Other</option>
+                </select>
+                
+                <button type="submit">SUBMIT</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modal-text"></p>
+        </div>
+    </div>
+</body>
+</html>
