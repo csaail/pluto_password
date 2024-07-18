@@ -4,7 +4,197 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Utility</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-style: solid;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .form-container {
+            text-align: left;
+            padding: 20px;
+        }
+
+        h2 {
+            background-color: #333;
+            color: white;
+            margin: -20px -20px 20px -20px;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+            text-align: left;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            text-align: left;
+            margin-top: 2.5%;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input[type="text"], select {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #e0e0e0;
+            width: calc(100% - 22px); /* Adjust for padding and border */
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4a7bf2;
+            color: white;
+            border: none;
+            margin-top: 2.5%;
+            border-radius: 5px;
+            font-size: 16px;
+            width: calc(100% - 22px);
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3a63d0;
+        }
+
+        .modal {
+            display: none; /* Ensure modal is hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.59);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border: 1px solid #88888800;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: modalFadeIn 0.3s ease-in-out;
+            font-size: 24px;
+        }
+
+        #modal-text .label {
+            font-size: 28px;
+            color: #333;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        #modal-text .result {
+            font-size: 36px;
+            color: green;
+            font-weight: bold;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @keyframes vibrate {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            50% { transform: translateX(2px); }
+            75% { transform: translateX(-2px); }
+            100% { transform: translateX(0); }
+        }
+
+        .invalid {
+            border-color: red;
+            animation: vibrate 0.3s ease-in-out;
+        }
+
+        input, select {
+            animation: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+                padding: 10px;
+            }
+
+            h2 {
+                font-size: 20px;
+                padding: 8px;
+            }
+
+            input[type="text"], select, button {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 90%;
+                max-width: 300px;
+            }
+        }
+
+        #modal-text .ssid {
+            font-size: 16px;
+            color: #666;
+            margin-top: 20px;
+            display: block;
+        }
+    </style>
     <script>
         function handleFormSubmit(event) {
             event.preventDefault();
@@ -12,7 +202,7 @@
             const ssid = document.getElementById('drone-ssid');
             const authKey = document.getElementById('auth-key');
             const boughtFrom = document.getElementById('bought-from');
-            
+
             let isValid = true;
 
             if (!ssid.value) {
@@ -60,13 +250,17 @@
                 password = authKeyValue + appendString;
             }
 
-            showModal('Generated Password: <strong>' + password + '</strong>');
+            showModal(password, ssidValue);
         }
 
-        function showModal(message) {
+        function showModal(message, ssid) {
             const modal = document.getElementById('myModal');
             const modalText = document.getElementById('modal-text');
-            modalText.innerHTML = message;
+            modalText.innerHTML = `
+                <span class="label">Generated Password:</span>
+                <span class="result">${message}</span>
+                <span class="ssid">for SSID: ${ssid}</span>
+            `;
             modal.style.display = 'flex';
         }
 
@@ -89,14 +283,12 @@
                 }
             });
 
-            // Remove invalid class on input change
             document.querySelectorAll('input, select').forEach(input => {
                 input.addEventListener('input', () => {
                     input.classList.remove('invalid');
                 });
             });
 
-            // Hide modal on page load
             closeModal();
         });
     </script>
@@ -104,7 +296,7 @@
 <body>
     <div class="container">
         <div class="form-container">
-            <h2>Password Utility</h2>
+            <h2>Get your Drone's Password</h2>
             <form id="password-utility-form">
                 <label for="drone-ssid">DRONE SSID:</label>
                 <input type="text" id="drone-ssid" name="drone-ssid" required>
@@ -121,12 +313,11 @@
                     <option value="Other">Other</option>
                 </select>
                 
-                <button type="submit">SUBMIT</button>
+                <button type="submit">Generate Password</button>
             </form>
         </div>
     </div>
 
-    <!-- The Modal -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
